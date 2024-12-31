@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'schemas/user.schema';
 import { Model, ObjectId } from 'mongoose';
 import { ValidateIdDto } from './dto/validate-id.dto';
+import * as bycrypt from 'bcrypt'
 
 @Injectable()
 export class UserService {
@@ -16,7 +17,7 @@ export class UserService {
 
     if (emailExists) throw new ConflictException('Email already exists')
 
-    const user = new this.userModel({...createUserDto, createdAt: new Date()})
+    const user = new this.userModel({...createUserDto, createdAt: new Date(), password: bycrypt.hashSync(createUserDto.password, 14)})
 
     try {
       await user.save()
