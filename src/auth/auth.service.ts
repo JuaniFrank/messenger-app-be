@@ -1,9 +1,10 @@
-import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt'; 
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +19,12 @@ export class AuthService {
 
     const user = await this.userService.findOneByEmail(loginCredentialsDto.email);
 
-    if (!user) return null
+    if (!user) throw new NotFoundException('User not found')
 
-    if (user.password !== loginCredentialsDto.password) throw new UnauthorizedException('Invalid credentials')
+      const passwordMatches = await bcrypt.compare(loginCredentialsDto.password, user.password);
+      if (!passwordMatches) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
     const payload = { sub: user.id, username: user.email };
     const token = await this.jwtService.signAsync(payload);
