@@ -56,4 +56,8 @@ export class UserService {
     return await this.userModel.findByIdAndDelete(id)
 
   }
+
+  async findOneByEmail(email: string) {
+    return await this.userModel.findOne({ email })
+  }
 }
