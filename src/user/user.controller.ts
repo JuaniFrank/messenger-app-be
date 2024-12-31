@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ConflictException, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ObjectId } from 'mongoose';
 import { ValidateIdDto } from './dto/validate-id.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -20,21 +19,17 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: ValidateIdDto) {
-
-
+  async find(@Param(new ValidationPipe({ whitelist: true })) { id }: ValidateIdDto) {
     return this.userService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: ValidateIdDto, @Body() updateUserDto: UpdateUserDto) {
-
-    return this.userService.update(+id, updateUserDto);
+  async update(@Param(new ValidationPipe({ whitelist: true })) { id }: ValidateIdDto, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: ValidateIdDto) {
-  
+  remove(@Param(new ValidationPipe({ whitelist: true })) { id }: ValidateIdDto) {
     return this.userService.delete(id);
   }
 }
