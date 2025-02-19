@@ -11,4 +11,9 @@ export class AuthController {
     return this.authService.login(loginCredentialsDto);
   }
 
+
+  @Post('register')
+  async register(@Body() loginCredentialsDto: LoginCredentialsDto) {
+    return this.authService.register(loginCredentialsDto);
+  }
 }
