@@ -5,6 +5,7 @@ import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt'; 
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,11 @@ export class AuthService {
     const payload = { sub: user.id, username: user.email };
     const token = await this.jwtService.signAsync(payload);
     return {token}
+  }
+
+  async register(createUserDto: CreateUserDto): Promise<CreateUserDto> {
+    const user = await this.userService.create(createUserDto);
+    return user;
   }
 
 }
