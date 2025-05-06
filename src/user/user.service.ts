@@ -5,6 +5,7 @@ import { User } from 'schemas/user.schema';
 import { Model, ObjectId } from 'mongoose';
 import { ValidateIdDto } from './dto/validate-id.dto';
 import * as bycrypt from 'bcrypt'
+import { UserType } from 'src/types/user';
 
 @Injectable()
 export class UserService {
@@ -27,8 +28,8 @@ export class UserService {
     return user
   }
 
-  findAll() {
-    return this.userModel.find()
+  async findAll(): Promise<UserType[]> {
+    return this.userModel.find().lean().exec();
   }
 
   async update(id: string, updateUserDto: CreateUserDto) {
@@ -42,7 +43,6 @@ export class UserService {
     } catch (error) {
       return error
     }
-
   }
 
   async findOne(id: string) {
