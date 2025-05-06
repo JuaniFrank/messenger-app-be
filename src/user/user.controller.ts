@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ValidateIdDto } from './dto/validate-id.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { UserType } from 'src/types/user';
 
 @Controller('user')
 export class UserController {
@@ -15,8 +16,9 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll(): Promise<UserType[]> {
+    const users: UserType[] = await this.userService.findAll();
+    return users;
   }
 
   @Get(':id')
