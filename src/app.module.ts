@@ -1,15 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TaskModule } from './task/task.module';
 
 @Module({
-  imports: [AuthModule, UserModule, MongooseModule.forRoot('mongodb://root:root123@localhost:27017/miapp?authSource=admin')],
+  imports: [TaskModule],
   controllers: [],
   providers: [],
-
 })
 export class AppModule {}
-
-
-
