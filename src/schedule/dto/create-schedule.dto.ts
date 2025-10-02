@@ -7,6 +7,9 @@ import {
 } from 'class-validator';
 
 export class CreateScheduleDto {
+  @IsString()
+  userId: string;
+
   @IsISO8601()
   time: string; // ISO 8601 time
 

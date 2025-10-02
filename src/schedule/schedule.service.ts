@@ -7,6 +7,8 @@ import {
   collection,
   addDoc,
   doc,
+  where,
+  query,
   getDoc,
   getDocs,
   setDoc,
@@ -20,14 +22,8 @@ export class ScheduleService {
   private collectionRef = collection(this.db, 'Schedules');
 
   async create(createScheduleDto: CreateScheduleDto): Promise<Schedule> {
-    const nowIso = new Date().toISOString();
-    const data = {
-      ...createScheduleDto,
-      createdAt: nowIso,
-      updatedAt: nowIso,
-    } as Omit<Schedule, 'id'>;
-    const ref = await addDoc(this.collectionRef, data as any);
-    return { id: ref.id, ...(data as any) } as Schedule;
+    const ref = await addDoc(this.collectionRef, createScheduleDto as any);
+    return { id: ref.id, ...(createScheduleDto as any) } as Schedule;
   }
 
   async findAll(): Promise<Schedule[]> {
@@ -46,6 +42,17 @@ export class ScheduleService {
     return { id: snap.id, ...(snap.data() as any) } as Schedule;
   }
 
+  async getSchedulesByUser(userId: string): Promise<Schedule[]> {
+    const snapshot = await getDocs(
+      query(this.collectionRef, where('userId', '==', userId)),
+    );
+
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Schedule[];
+  }
+
   async update(
     id: string,
     updateScheduleDto: UpdateScheduleDto,
@@ -56,11 +63,9 @@ export class ScheduleService {
       throw new NotFoundException('Schedule not found');
     }
     const prev = snap.data() as any;
-    const nowIso = new Date().toISOString();
     const merged = {
       ...prev,
       ...updateScheduleDto,
-      updatedAt: nowIso,
     };
     await setDoc(ref, merged, { merge: true });
     return { id, ...(merged as any) } as Schedule;

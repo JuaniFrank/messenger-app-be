@@ -31,6 +31,11 @@ export class ScheduleController {
     return this.scheduleService.findOne(id);
   }
 
+  @Get('user/:userId')
+  getSchedulesByUser(@Param('userId') userId: string): Promise<Schedule[]> {
+    return this.scheduleService.getSchedulesByUser(userId);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,
