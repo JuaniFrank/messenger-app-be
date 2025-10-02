@@ -31,7 +31,7 @@ export class TaskService {
       ...createTaskDto,
       createdAt: nowIso,
       updatedAt: nowIso,
-      completedAt: createTaskDto.completed ? nowIso : undefined,
+      completedAt: createTaskDto.completed ? nowIso : null,
     } as Omit<Task, 'id' | 'subtasks'>;
 
     const docRef = await addDoc(this.collectionRef, data as any);
