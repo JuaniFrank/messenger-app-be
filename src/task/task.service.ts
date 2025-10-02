@@ -31,7 +31,7 @@ export class TaskService {
       ...createTaskDto,
       createdAt: nowIso,
       updatedAt: nowIso,
-      completedAt: createTaskDto.completed ? nowIso : undefined,
+      completedAt: createTaskDto.completed ? nowIso : null,
     } as Omit<Task, 'id' | 'subtasks'>;
 
     const docRef = await addDoc(this.collectionRef, data as any);
@@ -52,6 +52,16 @@ export class TaskService {
       throw new NotFoundException('Task not found');
     }
     return { id: snap.id, ...(snap.data() as any) } as Task;
+  }
+
+  async getTasksByUser(userId: string): Promise<Task[]> {
+    const snapshot = await getDocs(
+      query(this.collectionRef, where('userId', '==', userId)),
+    );
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Task[];
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
