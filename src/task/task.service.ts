@@ -54,6 +54,16 @@ export class TaskService {
     return { id: snap.id, ...(snap.data() as any) } as Task;
   }
 
+  async getTasksByUser(userId: string): Promise<Task[]> {
+    const snapshot = await getDocs(
+      query(this.collectionRef, where('userId', '==', userId)),
+    );
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Task[];
+  }
+
   async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const ref = doc(this.db, 'Tasks', id);
     const snap = await getDoc(ref);

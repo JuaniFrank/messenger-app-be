@@ -31,6 +31,11 @@ export class TaskController {
     return this.taskService.findOne(id);
   }
 
+  @Get('user/:userId')
+  getTasksByUser(@Param('userId') userId: string): Promise<Task[]> {
+    return this.taskService.getTasksByUser(userId);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,
