@@ -35,8 +35,6 @@ async function bootstrap() {
     module.hot.accept();
     module.hot.dispose(() => app.close());
   }
-
-  process.stdout.write('NestJS logs enabled\n');
 }
 bootstrap();
 
