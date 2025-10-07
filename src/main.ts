@@ -25,19 +25,6 @@ async function bootstrap() {
   console.log(
     `Application is running on: http://${getLocalIPAddress()}:${PORT}`,
   );
-
-  try {
-    const db = getFirestore(firebaseApp);
-    const taskRef = doc(db, 'Tasks', 'X85j4Of3YqC73jZRXhyY');
-    const taskSnap = await getDoc(taskRef);
-    if (taskSnap.exists()) {
-      console.log('Task document data:', taskSnap.data());
-    } else {
-      console.log('Task document not found');
-    }
-  } catch (err) {
-    console.error('Error fetching Firestore document:', err);
-  }
 }
 bootstrap();
 
