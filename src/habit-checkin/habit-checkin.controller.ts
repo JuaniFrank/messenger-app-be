@@ -29,7 +29,6 @@ export class HabitCheckinController {
 
   @Get()
   findAll() {
-    console.log('findAll');
     return this.habitCheckinService.findAll();
   }
 
