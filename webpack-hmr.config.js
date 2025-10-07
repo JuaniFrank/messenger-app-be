@@ -26,10 +26,16 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new RunScriptWebpackPlugin({ name: 'server.js' }),
+    new RunScriptWebpackPlugin({
+      name: 'server.js',
+      autoRestart: true,
+      // 👇 esto hace que reinicie cada vez que webpack recompila
+      restartable: true,
+    }),
   ],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'server.js',
   },
+  watch: true, // 👈 importante para detectar cambios
 };
