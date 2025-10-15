@@ -43,6 +43,67 @@ export class HabitService {
     return `This action returns a #${id} habit`;
   }
 
+  async getHabitByUserIdAndDate(userId: string, date: string) {
+    // 🔹 1. Traer los hábitos del usuario
+    const snapshot = await getDocs(
+      query(this.collectionRef, where('userId', '==', userId)),
+    );
+
+    const allHabits = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // 🔹 2. Parsear la fecha (viene como 7-10-2025)
+    const [day, month, year] = date.split('-').map(Number);
+    const today = new Date(year, month - 1, day);
+    console.log(today);
+    const todayDay = today.getDay(); // 0 = domingo
+    const todayDate = today.getDate();
+    console.log(todayDate);
+    console.log(todayDay);
+
+    // 🔹 3. Filtrar según la frecuencia
+    const habitsForToday = allHabits.filter((habit: any) => {
+      // Soportar tanto "frequency" como "Frecuency"
+      const frequency = habit.frequency || habit.Frecuency;
+      if (!habit.isActive || !frequency) return false;
+
+      // convertir timestamp Firestore → Date
+      let createdAtDate: Date;
+      if (habit.createdAt?.seconds) {
+        createdAtDate = new Date(habit.createdAt.seconds * 1000);
+      } else {
+        createdAtDate = new Date(habit.createdAt);
+      }
+
+      switch (frequency) {
+        case 'daily':
+          return true;
+
+        case 'weekly':
+          if (Array.isArray(habit.customDays) && habit.customDays.length > 0) {
+            return habit.customDays.includes(todayDay);
+          }
+          return createdAtDate.getDay() === todayDay;
+
+        case 'monthly':
+          return createdAtDate.getDate() === todayDate;
+
+        case 'custom':
+          return (
+            Array.isArray(habit.customDays) &&
+            habit.customDays.includes(todayDay)
+          );
+
+        default:
+          return false;
+      }
+    });
+
+    return habitsForToday;
+  }
+
   update(id: number, updateHabitDto: UpdateHabitDto) {
     return `This action updates a #${id} habit`;
   }

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { HabitService } from './habit.service';
 import { CreateHabitDto } from './dto/create-habit.dto';
@@ -14,6 +15,14 @@ import { UpdateHabitDto } from './dto/update-habit.dto';
 @Controller('habit')
 export class HabitController {
   constructor(private readonly habitService: HabitService) {}
+
+  @Get('by-userid-and-date')
+  getHabitByUserIdAndDate(
+    @Query('userId') habitId: string,
+    @Query('date') date: string,
+  ) {
+    return this.habitService.getHabitByUserIdAndDate(habitId, date);
+  }
 
   @Post()
   create(@Body() createHabitDto: CreateHabitDto) {
