@@ -16,6 +16,14 @@ import { UpdateHabitDto } from './dto/update-habit.dto';
 export class HabitController {
   constructor(private readonly habitService: HabitService) {}
 
+  @Get('get-habits-and-checkins-by-userid-and-date')
+  getHabitsAndCheckinsByUserIdAndDate(
+    @Query('userId') userId: string,
+    @Query('date') date: string,
+  ) {
+    return this.habitService.getHabitsAndCheckinsByUserIdAndDate(userId, date);
+  }
+
   @Get('by-userid-and-date')
   getHabitByUserIdAndDate(
     @Query('userId') habitId: string,

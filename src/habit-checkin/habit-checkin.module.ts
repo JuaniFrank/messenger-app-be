@@ -5,5 +5,6 @@ import { HabitCheckinController } from './habit-checkin.controller';
 @Module({
   controllers: [HabitCheckinController],
   providers: [HabitCheckinService],
+  exports: [HabitCheckinService],
 })
 export class HabitCheckinModule {}

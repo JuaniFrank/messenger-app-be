@@ -1,4 +1,4 @@
-import 'webpack/hot/poll?100';
+// import 'webpack/hot/poll?100';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';

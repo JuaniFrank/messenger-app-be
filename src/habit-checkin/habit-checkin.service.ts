@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateHabitCheckinDto } from './dto/create-habit-checkin.dto';
 import { UpdateHabitCheckinDto } from './dto/update-habit-checkin.dto';
 import {
@@ -9,10 +13,12 @@ import {
   getDocs,
   getFirestore,
   query,
+  Timestamp,
   where,
 } from 'firebase/firestore';
 import { getApp } from 'firebase/app';
 import { HabitCheckin } from './entities/habit-checkin.entity';
+import { getDayRange, parseQueryDate } from 'src/utils/date.utils';
 
 @Injectable()
 export class HabitCheckinService {
@@ -55,6 +61,30 @@ export class HabitCheckinService {
     })) as HabitCheckin[];
   }
 
+  async getHabitCheckinsByHabitsIdsAndDate(habitsIds: string[], date: string) {
+    //Query param:  date=04-11-2025
+    console.log('habitsIds from getHabitCheckinsByHabitsIdsAndDate', habitsIds);
+    console.log('date from getHabitCheckinsByUserIdAndDate', date);
+
+    const { start, end } = getDayRange(date);
+
+    console.log('start', start);
+    console.log('end', end);
+
+    const res = await getDocs(
+      query(
+        this.collectionRef,
+        where('habitId', 'in', habitsIds),
+        where('date', '>=', start),
+        where('date', '<=', end),
+      ),
+    );
+    return res.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as HabitCheckin[];
+  }
+
   async getHabitCheckinsByHabitIdAndDate(habitId: string, date: string) {
     console.log('habitId', habitId);
     console.log('date', date);
@@ -71,8 +101,37 @@ export class HabitCheckinService {
     })) as HabitCheckin[];
   }
 
-  create(createHabitCheckinDto: CreateHabitCheckinDto) {
-    return addDoc(this.collectionRef, createHabitCheckinDto);
+  async create(createHabitCheckinDto: CreateHabitCheckinDto) {
+    // 🔹 Convertir ISO string a Firestore Timestamp
+    const firestoreDate = Timestamp.fromDate(
+      new Date(createHabitCheckinDto.date),
+    );
+
+    try {
+      // 🔹 Guardar en Firestore
+      const docRef = await addDoc(this.collectionRef, {
+        habitId: createHabitCheckinDto.habitId,
+        date: firestoreDate,
+        completed: !!createHabitCheckinDto.completed,
+        quantity: createHabitCheckinDto.quantity ?? 1,
+        notes: createHabitCheckinDto.notes ?? '',
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+      });
+
+      return {
+        success: true,
+        message: 'Habit checkin created successfully',
+        data: {
+          id: docRef.id,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error creating habit checkin',
+      };
+    }
   }
 
   update(id: number, updateHabitCheckinDto: UpdateHabitCheckinDto) {

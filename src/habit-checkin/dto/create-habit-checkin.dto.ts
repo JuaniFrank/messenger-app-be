@@ -17,8 +17,9 @@ export class CreateHabitCheckinDto {
   @IsString()
   notes?: string;
 
+  @IsOptional()
   @IsString()
-  createdAt: string; // ISO 8601
+  createdAt?: string; // ISO 8601
 
   @IsOptional()
   @IsString()
