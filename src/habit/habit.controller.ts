@@ -1,0 +1,64 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
+import { HabitService } from './habit.service';
+import { CreateHabitDto } from './dto/create-habit.dto';
+import { UpdateHabitDto } from './dto/update-habit.dto';
+
+@Controller('habit')
+export class HabitController {
+  constructor(private readonly habitService: HabitService) {}
+
+  @Get('get-habits-and-checkins-by-userid-and-date')
+  getHabitsAndCheckinsByUserIdAndDate(
+    @Query('userId') userId: string,
+    @Query('date') date: string,
+  ) {
+    return this.habitService.getHabitsAndCheckinsByUserIdAndDate(userId, date);
+  }
+
+  @Get('by-userid-and-date')
+  getHabitByUserIdAndDate(
+    @Query('userId') habitId: string,
+    @Query('date') date: string,
+  ) {
+    return this.habitService.getHabitByUserIdAndDate(habitId, date);
+  }
+
+  @Post()
+  create(@Body() createHabitDto: CreateHabitDto) {
+    return this.habitService.create(createHabitDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.habitService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.habitService.findOne(+id);
+  }
+
+  @Get('user/:userId')
+  getHabitsByUser(@Param('userId') userId: string) {
+    return this.habitService.getHabitsByUser(userId);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateHabitDto: UpdateHabitDto) {
+    return this.habitService.update(+id, updateHabitDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.habitService.remove(+id);
+  }
+}

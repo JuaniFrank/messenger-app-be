@@ -1,8 +1,11 @@
+// import 'webpack/hot/poll?100';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+
+declare const module: any;
 
 async function bootstrap() {
   const firebaseConfig = {
@@ -15,28 +18,22 @@ async function bootstrap() {
     measurementId: 'G-LGNZJ2N7D2',
   };
 
-  const firebaseApp = initializeApp(firebaseConfig);
+  initializeApp(firebaseConfig);
 
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(new ValidationPipe());
 
   const PORT = 3000;
   await app.listen(PORT, '0.0.0.0');
+
   console.log(
-    `Application is running on: http://${getLocalIPAddress()}:${PORT}`,
+    `🚀 Application is running on: http://${getLocalIPAddress()}:${PORT}`,
   );
 
-  try {
-    const db = getFirestore(firebaseApp);
-    const taskRef = doc(db, 'Tasks', 'X85j4Of3YqC73jZRXhyY');
-    const taskSnap = await getDoc(taskRef);
-    if (taskSnap.exists()) {
-      console.log('Task document data:', taskSnap.data());
-    } else {
-      console.log('Task document not found');
-    }
-  } catch (err) {
-    console.error('Error fetching Firestore document:', err);
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
   }
 }
 bootstrap();
